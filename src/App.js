@@ -21,7 +21,6 @@ function App() {
     setWriteUp('');
 
     try {
-      const systemPrompt = `You are an expert SOC analyst and security writer. Transform raw CTF investigation artifacts into a polished, professional write-up.
 	
 Given raw materials (notes, screenshots, queries), generate a write-up with these sections:
 1. Objective (what was the challenge?)
@@ -32,7 +31,7 @@ Given raw materials (notes, screenshots, queries), generate a write-up with thes
 
 Make it professional, clear, and suitable for a portfolio or LinkedIn post. Use Markdown formatting.`;
 
-      const userMessage = `CTF: ${ctfName}
+      
 Scenario: ${scenario}
 
 Raw Artifacts and Notes:
