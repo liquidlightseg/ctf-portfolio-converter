@@ -46,39 +46,43 @@ Raw Artifacts and Notes:
 ${artifacts}
 
 Generate a professional write-up from this.`;
+const generateWriteUp = async () => {
+  if (!ctfName || !scenario || !artifacts) {
+    setError('Please fill in all fields');
+    return;
+  }
 
-      const response = await axios.post(
-        'https://api.anthropic.com/v1/messages',
-        {
-          model: 'claude-3-5-sonnet-20241022',
-          max_tokens: 2000,
-          system: systemPrompt,
-          messages: [
-            {
-              role: 'user',
-              content: userMessage,
-            },
-          ],
-        },
-        {
-          headers: {
-            'x-api-key': process.env.REACT_APP_CLAUDE_API_KEY,
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json',
-          },
-        }
-      );
+  setLoading(true);
+  setError('');
+  setWriteUp('');
 
-      const generatedText = response.data.content[0].text;
-      setWriteUp(generatedText);
-    } catch (err) {
-      const errorMessage = err.response?.data?.error?.message || err.message;
-      setError(`Error: ${errorMessage}`);
-      console.error('API Error:', err);
-    } finally {
-      setLoading(false);
+  try {
+    const response = await fetch('/api/generateWriteUp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ctfName,
+        scenario,
+        artifacts,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'API Error');
     }
-  };
+
+    const data = await response.json();
+    setWriteUp(data.writeUp);
+  } catch (err) {
+    setError(`Error: ${err.message}`);
+    console.error('API Error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const downloadMarkdown = () => {
     if (!writeUp) return;
