@@ -21,40 +21,32 @@ function App() {
     setWriteUp('');
 
     try {
-	
-Given raw materials (notes, screenshots, queries), generate a write-up with these sections:
-1. Objective (what was the challenge?)
-2. Methodology (how did you approach it?)
-3. Key Findings (what did you discover?)
-4. Tools & Techniques (what tools did you use?)
-5. What I Learned (key takeaway)
+      const response = await fetch('/api/generateWriteUp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ctfName,
+          scenario,
+          artifacts,
+        }),
+      });
 
-Make it professional, clear, and suitable for a portfolio or LinkedIn post. Use Markdown formatting.`;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API Error');
+      }
 
-      
-Scenario: ${scenario}
-
-Raw Artifacts and Notes:
-${artifacts}
-
-Generate a professional write-up from this.`;
-
-      // Call Claude API
-      const generatedText = await callAPI(
-      ctfName,
-      scenario,
-      artifacts,
-      process.env.REACT_APP_CLAUDE_API_KEY
-    );
-    setWriteUp(generatedText);
-  } catch (err) {
-    setError(`Error: ${err.message}`);
-    console.error('API Error:', err);
-  } finally {
-    setLoading(false);
-  }
-};
-
+      const data = await response.json();
+      setWriteUp(data.writeUp);
+    } catch (err) {
+      setError(`Error: ${err.message}`);
+      console.error('API Error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
   const downloadMarkdown = () => {
     const element = document.createElement('a');
     const file = new Blob([writeUp], { type: 'text/plain' });
